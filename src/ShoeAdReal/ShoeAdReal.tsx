@@ -25,29 +25,28 @@ import {
 } from "./film";
 
 // Realistic 30 s urban spot for the (fictional) NOVA X.
-// Music: 120 BPM → one beat = 15 frames. Drop at frame 180, end-card hit at 750.
+// Music: 120 BPM → one beat = 15 frames. Drop at frame 255, end-card hit at 775.
 const BEAT = 15;
-const DROP = 180;
-const END = 750;
+const DROP = 255;
+const END = 775;
 const IW = 1024;
 const IH = 559;
 
 // ---------- audio ----------
 const VO: [string, number, number][] = [
-  // file, start frame, length in frames
-  ["01", 12, 30],
-  ["02", 50, 38],
-  ["03", 92, 44],
-  ["04", 134, 44],
-  ["05", 192, 33],
-  ["06", 236, 48],
-  ["07", 312, 45],
-  ["08", 370, 57],
-  ["09", 470, 67],
-  ["10", 612, 59],
-  ["11", 680, 57],
-  ["12", 770, 53],
-  ["13", 840, 32],
+  // ElevenLabs take (voice "Ben", eleven_v3), cut per line: file, start frame, length
+  ["01", 6, 56],
+  ["02", 62, 39],
+  ["03", 102, 74],
+  ["04", 176, 71],
+  ["05", 258, 52],
+  ["06", 312, 61],
+  ["07", 384, 148],
+  ["08", 534, 75],
+  ["09", 624, 80],
+  ["10", 706, 68],
+  ["11", 777, 69],
+  ["12", 842, 56],
 ];
 
 const musicVolume = (f: number) => {
@@ -61,20 +60,19 @@ const musicVolume = (f: number) => {
       }),
     );
   }
-  return 0.6 - duck * 0.32;
+  return 0.55 - duck * 0.33;
 };
 
 const SFX: [string, number, number][] = [
   ["alarm", 0, 0.35],
-  ["thud", 168, 0.9],
-  ["whoosh", 170, 0.6],
-  ["whoosh", 296, 0.5],
-  ["whoosh", 446, 0.5],
-  ["whoosh", 596, 0.55],
-  ["thud", 690, 0.4],
-  ["thud", 705, 0.4],
-  ["thud", 720, 0.4],
-  ["thud", 735, 0.5],
+  ["thud", 220, 0.9],
+  ["whoosh", 247, 0.6],
+  ["whoosh", 376, 0.5],
+  ["whoosh", 526, 0.5],
+  ["whoosh", 616, 0.55],
+  ["thud", 735, 0.4],
+  ["thud", 750, 0.4],
+  ["thud", 765, 0.5],
 ];
 
 const Sound: React.FC = () => (
@@ -82,7 +80,7 @@ const Sound: React.FC = () => (
     <Audio src={staticFile("audio/music.wav")} volume={musicVolume} />
     {VO.map(([id, s]) => (
       <Sequence key={id} from={s}>
-        <Audio src={staticFile(`audio/vo/${id}.wav`)} volume={1} />
+        <Audio src={staticFile(`audio/vo2/${id}.wav`)} volume={1} />
       </Sequence>
     ))}
     {SFX.map(([n, s, v], i) => (
@@ -208,23 +206,23 @@ const Street: React.FC = () => {
       >
         {tick ? "05:30" : "05:29"}
       </div>
-      <Caption lines={["Die Stadt schläft noch."]} delay={48} y={720} size={64} align="center" />
+      <Caption lines={["Die Stadt schläft noch."]} delay={60} y={720} size={64} align="center" />
     </FadeIn>
   );
 };
 
 const Snooze: React.FC = () => {
-  const f = useCurrentFrame(); // 0 = frame 90
+  const f = useCurrentFrame(); // 0 = frame 100
   const { fps } = useVideoConfig();
-  const slam = pop(f, fps, 6, 11);
-  const s = shake(f, 8, 16, 10);
-  const strike = ease(f, [42, 50], [0, 1], Easing.out(Easing.cubic));
-  const fall = Math.max(0, f - 52);
+  const slam = pop(f, fps, 33, 11);
+  const s = shake(f, 35, 16, 10);
+  const strike = ease(f, [68, 76], [0, 1], Easing.out(Easing.cubic));
+  const fall = Math.max(0, f - 80);
   const fallY = fall * fall * 1.6;
   const fallR = fall * 2.2;
-  const shoeY = interpolate(pop(f, fps, 72, 9), [0, 1], [-700, 0]);
-  const no = pop(f, fps, 78, 8);
-  const s2 = shake(f, 78, 18, 12);
+  const shoeY = interpolate(pop(f, fps, 114, 9), [0, 1], [-700, 0]);
+  const no = pop(f, fps, 120, 8);
+  const s2 = shake(f, 120, 18, 12);
   return (
     <AbsoluteFill style={{ background: "#050505", transform: `translate(${s.x + s2.x}px, ${s.y + s2.y}px)` }}>
       <Caption lines={["Dein Wecker sagt:"]} delay={0} y={190} size={44} align="center" color="#8A8F99" />
@@ -235,6 +233,7 @@ const Snooze: React.FC = () => {
           right: 0,
           top: 300,
           textAlign: "center",
+          visibility: f < 33 ? "hidden" : "visible",
           transform: `translateY(${fallY}px) rotate(${fallR}deg) scale(${2.2 - slam * 1.2})`,
           opacity: Math.min(1, slam * 2),
         }}
@@ -265,8 +264,8 @@ const Snooze: React.FC = () => {
           />
         </span>
       </div>
-      {f >= 44 ? <Caption lines={["Deine Schuhe sagen:"]} delay={44} y={560} size={44} align="center" color="#8A8F99" /> : null}
-      {f >= 72 ? (
+      {f >= 78 ? <Caption lines={["Deine Schuhe sagen:"]} delay={78} y={560} size={44} align="center" color="#8A8F99" /> : null}
+      {f >= 114 ? (
         <>
           <Cutout name="side-b" width={560} style={{ left: 520, top: 640 + shoeY }} />
           <div
@@ -330,7 +329,8 @@ const Reveal: React.FC = () => {
         />
       </div>
       <LightSweep start={30} len={36} opacity={0.45} />
-      <Caption label="DAS IST DER NOVA X" lines={["Leichter als jede Ausrede."]} delay={14} y={140} size={60} color="#111" accent="#6b7280" />
+      <Caption label="DAS IST DER NOVA X" lines={[]} delay={4} y={140} size={60} color="#111" accent="#6b7280" />
+      <Caption lines={["Leichter als jede Ausrede."]} delay={52} y={176} size={60} color="#111" />
       <div
         style={{
           position: "absolute",
@@ -354,7 +354,7 @@ const Reveal: React.FC = () => {
 };
 
 const Heel: React.FC = () => {
-  const f = useCurrentFrame(); // 0 = 300
+  const f = useCurrentFrame(); // 0 = 380
   const cam = { s: ease(f, [0, 150], [1.08, 1.3]), x: ease(f, [0, 150], [0, -70]), y: 0 };
   const gel = toScreen(390, 335, IW, IH, cam);
   return (
@@ -384,16 +384,18 @@ const Heel: React.FC = () => {
         <LightSweep start={50} len={45} opacity={0.3} />
         <AbsoluteFill style={{ background: "linear-gradient(100deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 35%, transparent 60%)" }} />
         <Vignette strength={0.55} />
-        <Caption label="GEL-DÄMPFUNG AN DER FERSE" lines={["Weich wie dein Bett.", "Nur schneller."]} delay={12} y={150} size={70} width={900} />
+        <Caption label="GEL-DÄMPFUNG AN DER FERSE" lines={[]} delay={4} y={150} size={70} width={900} />
+        <Caption lines={["Weich wie dein Bett."]} delay={54} y={186} size={70} width={900} />
+        <Caption lines={["Nur schneller."]} delay={116} y={270} size={70} width={900} accent="#fff" />
       </AbsoluteFill>
     </WhipIn>
   );
 };
 
 const POINTS = [
-  { x: 391, y: 223, label: "Atmungsaktives Mesh", dx: 30, d: 30 },
-  { x: 181, y: 193, label: "Reflektierende Overlays", dx: 10, d: 50 },
-  { x: 26, y: 238, label: "Gel-Ferse", dx: -110, d: 70 },
+  { x: 391, y: 223, label: "Atmungsaktives Mesh", dx: 30, d: 20 },
+  { x: 181, y: 193, label: "Reflektierende Overlays", dx: 10, d: 35 },
+  { x: 26, y: 238, label: "Gel-Ferse", dx: -110, d: 50 },
 ];
 
 const Words3: React.FC = () => {
@@ -402,7 +404,7 @@ const Words3: React.FC = () => {
   return (
     <div style={{ position: "absolute", left: 120, top: 170, fontFamily: display, fontWeight: 900, lineHeight: 0.95 }}>
       {["ATMET.", "FEDERT.", "LÄUFT."].map((w, i) => {
-        const p = pop(f, fps, 20 + i * 22, 10);
+        const p = pop(f, fps, [0, 22, 49][i], 10);
         return (
           <div
             key={w}
@@ -423,7 +425,7 @@ const Words3: React.FC = () => {
 };
 
 const ThreeQuarter: React.FC = () => {
-  const f = useCurrentFrame(); // 0 = 450
+  const f = useCurrentFrame(); // 0 = 530
   const { fps } = useVideoConfig();
   const rot = ease(f, [0, 150], [-14, 10]);
   const float = Math.sin(f / 13) * 12;
@@ -435,7 +437,7 @@ const ThreeQuarter: React.FC = () => {
     <WhipIn dir={-1}>
       <Studio dark />
       <Words3 />
-      <div style={{ position: "absolute", inset: 0, perspective: 1600, transform: `scale(${beatPunch(f + 450, 450, 600, 0.02)})` }}>
+      <div style={{ position: "absolute", inset: 0, perspective: 1600, transform: `scale(${beatPunch(f + 530, 525, 620, 0.02)})` }}>
         <Cutout
           name="three-quarter"
           width={W}
@@ -480,11 +482,11 @@ const ThreeQuarter: React.FC = () => {
 };
 
 const BlackEdition: React.FC = () => {
-  const f = useCurrentFrame(); // 0 = 600
-  const cam = { s: ease(f, [0, 90], [1.25, 1.02]), x: ease(f, [0, 90], [-60, 20]), y: 0 };
+  const f = useCurrentFrame(); // 0 = 620
+  const cam = { s: ease(f, [0, 115], [1.25, 1.02]), x: ease(f, [0, 115], [-60, 20]), y: 0 };
   const glitch = f < 10 ? (10 - f) * 3 : 0;
   // beat montage in the last 60 frames
-  const montageIdx = f >= 90 ? Math.floor((f - 90) / 7.5) : -1;
+  const montageIdx = f >= 115 ? Math.floor((f - 115) / 7.5) : -1;
   return (
     <AbsoluteFill style={{ background: "#000" }}>
       {montageIdx < 0 || montageIdx % 2 === 1 ? (
@@ -517,12 +519,9 @@ const BlackEdition: React.FC = () => {
       )}
       <AbsoluteFill style={{ background: "linear-gradient(rgba(0,0,0,0.6), transparent 35%)" }} />
       <Vignette strength={0.6} />
-      {f < 90 ? (
-        <>
-          <Caption label="UND JETZT NEU" lines={["Black Edition."]} delay={10} y={128} size={72} />
-          <Caption lines={["Für Straßen, die noch schlafen."]} delay={72} y={830} size={44} align="right" />
-        </>
-      ) : null}
+      <Caption label="UND JETZT NEU" lines={[]} delay={4} y={128} size={72} />
+      <Caption lines={["Black Edition."]} delay={36} y={164} size={72} />
+      <Caption lines={["Für Straßen, die noch schlafen."]} delay={84} y={830} size={44} align="right" />
     </AbsoluteFill>
   );
 };
@@ -533,9 +532,9 @@ const EndCard: React.FC = () => {
   const cam = { s: ease(f, [0, 150], [1.15, 1.0]), x: 0, y: 0, blur: 6 };
   const s = shake(f, 0, 24, 16);
   const tag = pop(f, fps, 34, 16);
-  const joke = pop(f, fps, 90, 14);
+  const joke = pop(f, fps, 72, 14);
   const shoe = pop(f, fps, 50, 14);
-  const out = ease(f, [135, 150], [1, 0]);
+  const out = ease(f, [112, 125], [1, 0]);
   return (
     <AbsoluteFill style={{ transform: `translate(${s.x}px, ${s.y}px)`, opacity: out }}>
       <Photo src="real/street.jpg" cam={cam} filter="brightness(0.45) contrast(1.1)" />
@@ -597,13 +596,13 @@ const Flash: React.FC<{ at: number; len?: number; color?: string }> = ({ at, len
 };
 
 const SCENES: { from: number; len: number; Comp: React.FC }[] = [
-  { from: 0, len: 90, Comp: Street },
-  { from: 90, len: 90, Comp: Snooze },
-  { from: DROP, len: 120, Comp: Reveal },
-  { from: 300, len: 150, Comp: Heel },
-  { from: 450, len: 150, Comp: ThreeQuarter },
-  { from: 600, len: 150, Comp: BlackEdition },
-  { from: END, len: 150, Comp: EndCard },
+  { from: 0, len: 100, Comp: Street },
+  { from: 100, len: DROP - 100, Comp: Snooze },
+  { from: DROP, len: 125, Comp: Reveal },
+  { from: 380, len: 150, Comp: Heel },
+  { from: 530, len: 90, Comp: ThreeQuarter },
+  { from: 620, len: END - 620, Comp: BlackEdition },
+  { from: END, len: 900 - END, Comp: EndCard },
 ];
 
 export const ShoeAdReal: React.FC = () => (

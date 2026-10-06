@@ -1,6 +1,6 @@
 """Procedurally generates the 30 s soundtrack + SFX for the NOVA X spot.
 
-120 BPM, A minor (Am - F - C - G). Drop at 6.0 s, end-card impact at 25.0 s.
+120 BPM, A minor (Am - F - C - G). Drop at 8.5 s, end-card impact at ~25.8 s.
 Writes public/audio/music.wav and public/audio/sfx/*.wav.
 Run: python3 scripts/make_music.py
 """
@@ -15,8 +15,8 @@ SR = 44100
 DUR = 30.0
 BPM = 120
 BEAT = 60 / BPM
-DROP = 6.0
-END = 25.0
+DROP = 8.5
+END = 775 / 30
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 OUT = Path(__file__).resolve().parent.parent / "public" / "audio"
