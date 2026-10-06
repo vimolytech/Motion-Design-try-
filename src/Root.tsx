@@ -4,6 +4,7 @@ import { HelloWorld } from "./HelloWorld";
 import { Logo } from "./HelloWorld/Logo";
 import { Title } from "./HelloWorld/Title";
 import { ShoeAd } from "./ShoeAd/ShoeAd";
+import { ShoeAdReal } from "./ShoeAdReal/ShoeAdReal";
 import { DURATION, FPS } from "./ShoeAd/theme";
 
 // Each <Composition> is an entry in the sidebar!
@@ -14,6 +15,14 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="ShoeAd"
         component={ShoeAd}
+        durationInFrames={DURATION}
+        fps={FPS}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="ShoeAdReal"
+        component={ShoeAdReal}
         durationInFrames={DURATION}
         fps={FPS}
         width={1920}
